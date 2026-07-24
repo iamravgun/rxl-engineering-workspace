@@ -122,7 +122,7 @@ export function LeftSidebar({
   );
 
   return (
-    <aside className="flex w-[72px] shrink-0 flex-col items-center border-r border-rxl-border bg-rxl-panel py-4 sm:w-[88px]">
+    <aside className="flex w-[88px] shrink-0 flex-col items-center border-r border-rxl-border bg-rxl-panel py-4">
       {renderGroup(TOP_SECTION)}
 
       <div className="my-3 h-px w-8 bg-rxl-border" />

@@ -6,7 +6,6 @@ import {
   Hand,
   Magnet,
   MousePointer2,
-  PanelRight,
   Redo2,
   Ruler,
   Undo2,
@@ -72,8 +71,6 @@ export function CanvasToolbar({
   onToggleGrid,
   snapEnabled,
   onToggleSnap,
-  pendingReviewCount,
-  onOpenRightPanel,
   activeLayer,
   onClearLayer,
 }: {
@@ -83,15 +80,12 @@ export function CanvasToolbar({
   onToggleGrid: () => void;
   snapEnabled: boolean;
   onToggleSnap: () => void;
-  pendingReviewCount: number;
-  onOpenRightPanel: () => void;
   activeLayer: CanvasLayer | null;
   onClearLayer: () => void;
 }) {
   return (
-    <div className="flex h-11 shrink-0 items-center gap-3 overflow-x-auto border-b border-rxl-border bg-rxl-panel px-4">
-      {/* Full breadcrumb — tablet and up, where there's room */}
-      <div className="hidden shrink-0 items-center gap-1.5 text-[12px] text-rxl-text-secondary md:flex">
+    <div className="flex h-11 shrink-0 items-center gap-3 border-b border-rxl-border bg-rxl-panel px-4">
+      <div className="flex shrink-0 items-center gap-1.5 text-[12px] text-rxl-text-secondary">
         <span className="font-medium text-rxl-text">DC-West-01</span>
         <ChevronRight className="size-3.5 text-rxl-text-tertiary" />
         <span>Data Hall A</span>
@@ -100,14 +94,10 @@ export function CanvasToolbar({
           Cold Aisle 01
         </span>
       </div>
-      {/* Compact current-location label — mobile only */}
-      <span className="shrink-0 truncate text-[12px] font-medium text-rxl-text md:hidden">
-        Cold Aisle 01
-      </span>
 
-      <div className="hidden h-3.5 w-px shrink-0 bg-rxl-border md:block" />
+      <div className="h-3.5 w-px shrink-0 bg-rxl-border" />
 
-      <span className="hidden shrink-0 rounded-sm border border-rxl-border-strong bg-rxl-surface px-1.5 py-0.5 text-[10.5px] font-medium uppercase tracking-wide text-rxl-text-secondary md:inline-flex">
+      <span className="shrink-0 rounded-sm border border-rxl-border-strong bg-rxl-surface px-1.5 py-0.5 text-[10.5px] font-medium uppercase tracking-wide text-rxl-text-secondary">
         Engineering Review
       </span>
 
@@ -145,9 +135,9 @@ export function CanvasToolbar({
         />
       </div>
 
-      <div className="hidden h-5 w-px shrink-0 bg-rxl-border sm:block" />
+      <div className="h-5 w-px shrink-0 bg-rxl-border" />
 
-      <div className="hidden shrink-0 items-center gap-0.5 sm:flex">
+      <div className="flex shrink-0 items-center gap-0.5">
         <ToolButton icon={Undo2} label="Undo" disabled />
         <ToolButton icon={Redo2} label="Redo" disabled />
       </div>
@@ -168,39 +158,6 @@ export function CanvasToolbar({
           onClick={onToggleSnap}
         />
       </div>
-
-      {/* Opens the Engineering Details drawer — only needed when the
-          right panel isn't already docked (below lg) */}
-      <Tooltip>
-        <TooltipTrigger
-          render={
-            <button
-              type="button"
-              aria-label={
-                pendingReviewCount > 0
-                  ? `Open engineering details, ${pendingReviewCount} item needs confirmation`
-                  : "Open engineering details"
-              }
-              onClick={onOpenRightPanel}
-              className="relative flex size-8 shrink-0 items-center justify-center rounded-md text-rxl-text-secondary transition-colors hover:bg-rxl-surface hover:text-rxl-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-rxl-accent lg:hidden"
-            >
-              <PanelRight className="size-4" strokeWidth={1.75} />
-              {pendingReviewCount > 0 && (
-                <span
-                  aria-hidden="true"
-                  className="absolute right-1 top-1 size-2 rounded-full bg-rxl-warning"
-                />
-              )}
-            </button>
-          }
-        />
-        <TooltipContent side="bottom">
-          Engineering Details
-          {pendingReviewCount > 0
-            ? ` — ${pendingReviewCount} needs confirmation`
-            : ""}
-        </TooltipContent>
-      </Tooltip>
     </div>
   );
 }

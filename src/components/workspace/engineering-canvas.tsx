@@ -389,15 +389,11 @@ function CoolingManifold({ label, x }: { label: string; x: number }) {
 export function EngineeringCanvas({
   selectedCabinetId,
   onSelectCabinet,
-  pendingReviewCount,
-  onOpenRightPanel,
   activeLayer,
   onSelectLayer,
 }: {
   selectedCabinetId: string;
   onSelectCabinet: (id: string) => void;
-  pendingReviewCount: number;
-  onOpenRightPanel: () => void;
   activeLayer: CanvasLayer | null;
   onSelectLayer: (layer: CanvasLayer | null) => void;
 }) {
@@ -433,8 +429,6 @@ export function EngineeringCanvas({
         onToggleGrid={() => setGridVisible((v) => !v)}
         snapEnabled={snapEnabled}
         onToggleSnap={() => setSnapEnabled((v) => !v)}
-        pendingReviewCount={pendingReviewCount}
-        onOpenRightPanel={onOpenRightPanel}
         activeLayer={activeLayer}
         onClearLayer={() => onSelectLayer(null)}
       />
@@ -608,9 +602,7 @@ export function EngineeringCanvas({
           onZoomOut={handleZoomOut}
           onFit={handleFit}
         />
-        <div className="hidden sm:block">
-          <CanvasMinimap />
-        </div>
+        <CanvasMinimap />
       </div>
     </section>
   );
