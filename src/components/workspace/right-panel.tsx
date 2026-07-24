@@ -77,7 +77,7 @@ function ValidationRow({ item }: { item: ValidationItem }) {
                 : "shrink-0 rounded bg-rxl-warning-muted px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-rxl-warning"
             }
           >
-            {passed ? "Passed" : "Needs Confirmation"}
+            {passed ? "Verified" : "Needs Confirmation"}
           </span>
         </div>
         <p className="mt-0.5 text-[12px] leading-snug text-rxl-text-tertiary">
@@ -109,6 +109,7 @@ export function RightPanel({
   const passedCount = VALIDATION_ITEMS.filter(
     (i) => i.status === "passed"
   ).length;
+  const allVerified = passedCount === VALIDATION_ITEMS.length;
 
   const [saveState, setSaveState] = useState<ActionState>("idle");
   const [packageState, setPackageState] = useState<ActionState>("idle");
@@ -134,18 +135,40 @@ export function RightPanel({
               {passedCount}/{VALIDATION_ITEMS.length}
             </span>
           </div>
-          <p className="mt-1 text-[11px] text-rxl-text-tertiary">
+
+          <div className="mt-3 flex items-center gap-2 rounded-md border border-rxl-border bg-rxl-surface px-3 py-2.5">
+            {allVerified ? (
+              <CheckCircle2 className="size-4 shrink-0 text-rxl-success" strokeWidth={2} />
+            ) : (
+              <AlertTriangle className="size-4 shrink-0 text-rxl-warning" strokeWidth={2} />
+            )}
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-rxl-text-tertiary">
+                Overall Status
+              </p>
+              <p className="text-[13px] font-medium text-rxl-text">
+                {allVerified
+                  ? "Ready for Engineering Package"
+                  : "Engineering Review Required"}
+              </p>
+            </div>
+          </div>
+
+          <p className="mt-2.5 text-[11px] text-rxl-text-tertiary">
             Validation updated 12 seconds ago
           </p>
 
-          <div className="mt-3 divide-y divide-rxl-border">
+          <h3 className="mt-5 text-[11px] font-semibold uppercase tracking-wide text-rxl-text-tertiary">
+            Validation Summary
+          </h3>
+          <div className="mt-1.5 divide-y divide-rxl-border">
             {VALIDATION_ITEMS.map((item) => (
               <ValidationRow key={item.label} item={item} />
             ))}
           </div>
         </div>
 
-        <Separator className="my-4 bg-rxl-border" />
+        <Separator className="my-5 bg-rxl-border" />
 
         {/* Selected component */}
         <div className="px-5">
@@ -166,7 +189,7 @@ export function RightPanel({
               <SpecRow label="Manufacturer" value="RXL Engineered Systems" />
             </div>
             <div className="mt-2.5 border-t border-rxl-border pt-2.5">
-              <span className="text-[12px] text-rxl-text-tertiary">
+              <span className="text-[10px] font-semibold uppercase tracking-wide text-rxl-text-tertiary">
                 Installation Notes
               </span>
               <p className="mt-1 text-[12px] leading-relaxed text-rxl-text-secondary">
@@ -182,45 +205,50 @@ export function RightPanel({
       <Separator className="bg-rxl-border" />
 
       {/* Actions */}
-      <div className="space-y-2 p-5">
-        <Button
-          variant="default"
-          disabled={packageState !== "idle"}
-          onClick={() => runAction(setPackageState)}
-          className="h-10 w-full gap-2 bg-rxl-accent text-[13px] font-semibold text-[#14100c] hover:bg-rxl-accent-hover disabled:opacity-90"
-        >
-          {packageState === "working" ? (
-            <Loader2 className="size-4 animate-spin" strokeWidth={2} />
-          ) : packageState === "done" ? (
-            <CheckCircle2 className="size-4" strokeWidth={2} />
-          ) : (
-            <PackageCheck className="size-4" strokeWidth={2} />
-          )}
-          {packageState === "working"
-            ? "Generating…"
-            : packageState === "done"
-            ? "Package Ready"
-            : "Generate Engineering Package"}
-        </Button>
-        <Button
-          variant="outline"
-          disabled={saveState !== "idle"}
-          onClick={() => runAction(setSaveState)}
-          className="h-9 w-full gap-2 border-rxl-border bg-transparent text-[13px] font-medium text-rxl-text-secondary hover:bg-rxl-surface hover:text-rxl-text"
-        >
-          {saveState === "working" ? (
-            <Loader2 className="size-[15px] animate-spin" strokeWidth={1.75} />
-          ) : saveState === "done" ? (
-            <CheckCircle2 className="size-[15px] text-rxl-success" strokeWidth={1.75} />
-          ) : (
-            <Save className="size-[15px]" strokeWidth={1.75} />
-          )}
-          {saveState === "working"
-            ? "Saving…"
-            : saveState === "done"
-            ? "Saved"
-            : "Save Project"}
-        </Button>
+      <div className="p-5">
+        <h3 className="mb-2.5 text-[11px] font-semibold uppercase tracking-wide text-rxl-text-tertiary">
+          Primary Actions
+        </h3>
+        <div className="space-y-2">
+          <Button
+            variant="default"
+            disabled={packageState !== "idle"}
+            onClick={() => runAction(setPackageState)}
+            className="h-10 w-full gap-2 bg-rxl-accent text-[13px] font-semibold text-[#14100c] hover:bg-rxl-accent-hover disabled:opacity-90"
+          >
+            {packageState === "working" ? (
+              <Loader2 className="size-4 animate-spin" strokeWidth={2} />
+            ) : packageState === "done" ? (
+              <CheckCircle2 className="size-4" strokeWidth={2} />
+            ) : (
+              <PackageCheck className="size-4" strokeWidth={2} />
+            )}
+            {packageState === "working"
+              ? "Generating…"
+              : packageState === "done"
+              ? "Package Ready"
+              : "Generate Engineering Package"}
+          </Button>
+          <Button
+            variant="outline"
+            disabled={saveState !== "idle"}
+            onClick={() => runAction(setSaveState)}
+            className="h-9 w-full gap-2 border-rxl-border bg-transparent text-[13px] font-medium text-rxl-text-secondary hover:bg-rxl-surface hover:text-rxl-text"
+          >
+            {saveState === "working" ? (
+              <Loader2 className="size-[15px] animate-spin" strokeWidth={1.75} />
+            ) : saveState === "done" ? (
+              <CheckCircle2 className="size-[15px] text-rxl-success" strokeWidth={1.75} />
+            ) : (
+              <Save className="size-[15px]" strokeWidth={1.75} />
+            )}
+            {saveState === "working"
+              ? "Saving…"
+              : saveState === "done"
+              ? "Saved"
+              : "Save Project"}
+          </Button>
+        </div>
       </div>
     </aside>
   );

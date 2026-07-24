@@ -84,10 +84,16 @@ export function CanvasToolbar({
         <ChevronRight className="size-3.5 text-rxl-text-tertiary" />
         <span>Data Hall A</span>
         <ChevronRight className="size-3.5 text-rxl-text-tertiary" />
-        <span className="rounded bg-rxl-accent-muted px-1.5 py-0.5 text-[11px] font-medium text-rxl-accent">
+        <span className="rounded border border-rxl-border-strong bg-rxl-surface px-1.5 py-0.5 text-[11px] font-medium text-rxl-text">
           Cold Aisle 01
         </span>
       </div>
+
+      <div className="mx-3 h-3.5 w-px bg-rxl-border" />
+
+      <span className="rounded-sm bg-rxl-surface px-1.5 py-0.5 text-[10.5px] font-medium uppercase tracking-wide text-rxl-text-tertiary">
+        Engineering Review
+      </span>
 
       <div className="mx-4 h-5 w-px bg-rxl-border" />
 

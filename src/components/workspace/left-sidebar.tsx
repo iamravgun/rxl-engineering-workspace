@@ -61,7 +61,7 @@ function SidebarButton({
             aria-current={active ? "true" : undefined}
             onClick={onSelect}
             className={cn(
-              "relative flex size-11 items-center justify-center rounded-md transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-rxl-accent",
+              "relative flex size-10 items-center justify-center rounded-md transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-rxl-accent",
               active
                 ? "bg-rxl-accent-muted text-rxl-accent"
                 : "text-rxl-text-secondary hover:bg-rxl-surface hover:text-rxl-text"
@@ -70,7 +70,7 @@ function SidebarButton({
             {active && (
               <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-rxl-accent" />
             )}
-            <Icon className="size-[19px]" strokeWidth={1.6} />
+            <Icon className="size-[17px]" strokeWidth={1.6} />
           </button>
         }
       />

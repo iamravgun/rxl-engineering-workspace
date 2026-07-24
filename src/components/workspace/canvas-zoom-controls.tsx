@@ -18,7 +18,7 @@ export function CanvasZoomControls({
   onFit: () => void;
 }) {
   return (
-    <div className="pointer-events-auto absolute bottom-5 left-5 flex items-center gap-0.5 rounded-md border border-rxl-border bg-rxl-panel/95 p-0.5 shadow-lg shadow-black/20 backdrop-blur-sm">
+    <div className="pointer-events-auto absolute bottom-5 left-5 flex items-center gap-0.5 rounded-md border border-rxl-border bg-rxl-panel p-0.5 shadow-md shadow-black/15">
       <button
         type="button"
         aria-label="Zoom out"

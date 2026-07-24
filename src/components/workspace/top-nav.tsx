@@ -56,7 +56,7 @@ export function TopNav() {
       <div className="flex-1" />
 
       {/* Global search */}
-      <div className="mr-4 hidden items-center gap-2 rounded-md border border-rxl-border bg-rxl-surface px-3 py-2 text-rxl-text-tertiary transition-colors focus-within:border-rxl-accent-border lg:flex">
+      <div className="mr-4 hidden h-9 items-center gap-2 rounded-md border border-rxl-border bg-rxl-surface px-3 text-rxl-text-tertiary transition-colors focus-within:border-rxl-accent-border lg:flex">
         <Search className="size-4" strokeWidth={1.75} />
         <input
           type="text"
@@ -75,13 +75,13 @@ export function TopNav() {
         className="relative mr-2 flex size-9 items-center justify-center rounded-md text-rxl-text-secondary transition-colors hover:bg-rxl-surface hover:text-rxl-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-rxl-accent"
       >
         <Bell className="size-[18px]" strokeWidth={1.75} />
-        <span className="absolute right-1.5 top-1.5 flex size-2 rounded-full bg-rxl-accent" />
+        <span className="absolute right-2 top-2 flex size-1.5 rounded-full bg-rxl-accent" />
       </button>
 
       {/* Profile */}
       <button
         type="button"
-        className="mr-4 flex items-center gap-2 rounded-md py-1.5 pl-1.5 pr-2 transition-colors hover:bg-rxl-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-rxl-accent"
+        className="mr-4 flex h-9 items-center gap-2 rounded-md py-1 pl-1 pr-2 transition-colors hover:bg-rxl-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-rxl-accent"
       >
         <div className="flex size-7 items-center justify-center rounded-full bg-rxl-surface-raised text-[11px] font-semibold text-rxl-text">
           DM

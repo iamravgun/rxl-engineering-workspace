@@ -44,6 +44,40 @@ function mmLabel(units: number) {
   return Math.round(units * UNIT_MM).toLocaleString("en-US");
 }
 
+function GridReferenceBubbles() {
+  const cols = Array.from({ length: 12 }, (_, i) => ({
+    label: String(i + 1),
+    x: ROOM.x + (i + 0.5) * (ROOM.w / 12),
+  }));
+  const rows = Array.from({ length: 6 }, (_, i) => ({
+    label: String.fromCharCode(65 + i),
+    y: ROOM.y + (i + 0.5) * (ROOM.h / 6),
+  }));
+
+  return (
+    <g aria-hidden>
+      {cols.map((c) => (
+        <g key={c.label}>
+          <line x1={c.x} y1={106} x2={c.x} y2={ROOM.y} stroke="var(--rxl-border)" strokeWidth={1} />
+          <circle cx={c.x} cy={98} r={7} fill="var(--rxl-panel)" stroke="var(--rxl-border-strong)" strokeWidth={1} />
+          <text x={c.x} y={101} fontSize={8} fontFamily="var(--font-mono)" fill="var(--rxl-text-tertiary)" textAnchor="middle">
+            {c.label}
+          </text>
+        </g>
+      ))}
+      {rows.map((r) => (
+        <g key={r.label}>
+          <line x1={186} y1={r.y} x2={ROOM.x} y2={r.y} stroke="var(--rxl-border)" strokeWidth={1} />
+          <circle cx={178} cy={r.y} r={7} fill="var(--rxl-panel)" stroke="var(--rxl-border-strong)" strokeWidth={1} />
+          <text x={178} y={r.y + 3} fontSize={8} fontFamily="var(--font-mono)" fill="var(--rxl-text-tertiary)" textAnchor="middle">
+            {r.label}
+          </text>
+        </g>
+      ))}
+    </g>
+  );
+}
+
 function TopRuler() {
   const ticks = [200, 400, 600, 800, 1000, 1200];
   return (
@@ -397,7 +431,7 @@ export function EngineeringCanvas({
         <svg
           viewBox={`0 0 ${VB_W} ${VB_H}`}
           className="h-full w-full transition-transform duration-150 ease-out"
-          style={{ transform: `scale(${zoom / 100})`, transformOrigin: "50% 50%" }}
+          style={{ transform: `scale(${zoom / 100})`, transformOrigin: "50% 50%", letterSpacing: "0.02em" }}
           role="img"
           aria-label="Data Hall A floor plan — Cold Aisle 01 containment layout with cabinets R01 through R12 and cooling manifold CM-02"
         >
@@ -425,6 +459,9 @@ export function EngineeringCanvas({
             height={VB_H}
             fill={gridVisible ? "url(#grid-major)" : "var(--rxl-bg)"}
           />
+
+          {/* architectural grid reference bubbles (A-F / 1-12) */}
+          <GridReferenceBubbles />
 
           {/* orientation marker */}
           <g transform={`translate(${VB_W - 60}, 60)`} aria-hidden>
