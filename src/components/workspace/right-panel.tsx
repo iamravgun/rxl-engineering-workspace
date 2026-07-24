@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import {
   AlertTriangle,
   CheckCircle2,
+  Loader2,
   PackageCheck,
   Save,
 } from "lucide-react";
@@ -97,10 +99,27 @@ function SpecRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-export function RightPanel() {
+type ActionState = "idle" | "working" | "done";
+
+export function RightPanel({
+  selectedCabinetId,
+}: {
+  selectedCabinetId: string;
+}) {
   const passedCount = VALIDATION_ITEMS.filter(
     (i) => i.status === "passed"
   ).length;
+
+  const [saveState, setSaveState] = useState<ActionState>("idle");
+  const [packageState, setPackageState] = useState<ActionState>("idle");
+
+  function runAction(setState: (s: ActionState) => void) {
+    setState("working");
+    window.setTimeout(() => {
+      setState("done");
+      window.setTimeout(() => setState("idle"), 1600);
+    }, 700);
+  }
 
   return (
     <aside className="flex w-[360px] shrink-0 flex-col border-l border-rxl-border bg-rxl-panel">
@@ -135,7 +154,7 @@ export function RightPanel() {
               Selected Component
             </h2>
             <span className="rounded bg-rxl-accent-muted px-1.5 py-0.5 font-mono text-[10px] font-semibold text-rxl-accent">
-              R04
+              {selectedCabinetId}
             </span>
           </div>
 
@@ -166,17 +185,41 @@ export function RightPanel() {
       <div className="space-y-2 p-5">
         <Button
           variant="default"
-          className="h-10 w-full gap-2 bg-rxl-accent text-[13px] font-semibold text-[#14100c] hover:bg-rxl-accent-hover"
+          disabled={packageState !== "idle"}
+          onClick={() => runAction(setPackageState)}
+          className="h-10 w-full gap-2 bg-rxl-accent text-[13px] font-semibold text-[#14100c] hover:bg-rxl-accent-hover disabled:opacity-90"
         >
-          <PackageCheck className="size-4" strokeWidth={2} />
-          Generate Engineering Package
+          {packageState === "working" ? (
+            <Loader2 className="size-4 animate-spin" strokeWidth={2} />
+          ) : packageState === "done" ? (
+            <CheckCircle2 className="size-4" strokeWidth={2} />
+          ) : (
+            <PackageCheck className="size-4" strokeWidth={2} />
+          )}
+          {packageState === "working"
+            ? "Generating…"
+            : packageState === "done"
+            ? "Package Ready"
+            : "Generate Engineering Package"}
         </Button>
         <Button
           variant="outline"
+          disabled={saveState !== "idle"}
+          onClick={() => runAction(setSaveState)}
           className="h-9 w-full gap-2 border-rxl-border bg-transparent text-[13px] font-medium text-rxl-text-secondary hover:bg-rxl-surface hover:text-rxl-text"
         >
-          <Save className="size-[15px]" strokeWidth={1.75} />
-          Save Project
+          {saveState === "working" ? (
+            <Loader2 className="size-[15px] animate-spin" strokeWidth={1.75} />
+          ) : saveState === "done" ? (
+            <CheckCircle2 className="size-[15px] text-rxl-success" strokeWidth={1.75} />
+          ) : (
+            <Save className="size-[15px]" strokeWidth={1.75} />
+          )}
+          {saveState === "working"
+            ? "Saving…"
+            : saveState === "done"
+            ? "Saved"
+            : "Save Project"}
         </Button>
       </div>
     </aside>

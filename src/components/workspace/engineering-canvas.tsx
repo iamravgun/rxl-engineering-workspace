@@ -1,8 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import { CanvasMinimap } from "@/components/workspace/canvas-minimap";
-import { CanvasToolbar } from "@/components/workspace/canvas-toolbar";
-import { CanvasZoomControls } from "@/components/workspace/canvas-zoom-controls";
+import { cn } from "@/lib/utils";
+import {
+  CanvasToolbar,
+  type CanvasTool,
+} from "@/components/workspace/canvas-toolbar";
+import {
+  CanvasZoomControls,
+  ZOOM_MAX,
+  ZOOM_MIN,
+} from "@/components/workspace/canvas-zoom-controls";
 
 // Coordinate system: 1 SVG unit = 15mm. Minor grid (40u = 600mm) matches
 // standard raised-floor tile pitch; major grid (200u = 3,000mm) is bolded.
@@ -29,9 +38,7 @@ const bottomRow = Array.from({ length: 6 }, (_, i) => ({
   y: 390,
 }));
 
-const SELECTED_ID = "R04";
-const selectedCabinet = topRow.find((c) => c.id === SELECTED_ID)!;
-const alignedCabinet = bottomRow[3]; // R10, same column as R04
+const ALL_CABINETS = [...topRow, ...bottomRow];
 
 function mmLabel(units: number) {
   return Math.round(units * UNIT_MM).toLocaleString("en-US");
@@ -162,14 +169,34 @@ function Cabinet({
   x,
   y,
   selected,
+  interactive,
+  onSelect,
 }: {
   id: string;
   x: number;
   y: number;
   selected?: boolean;
+  interactive?: boolean;
+  onSelect?: (id: string) => void;
 }) {
   return (
-    <g>
+    <g
+      onClick={interactive ? () => onSelect?.(id) : undefined}
+      className={interactive ? "cursor-pointer" : undefined}
+      role={interactive ? "button" : undefined}
+      aria-label={interactive ? `Select cabinet ${id}` : undefined}
+      tabIndex={interactive ? 0 : undefined}
+      onKeyDown={
+        interactive
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onSelect?.(id);
+              }
+            }
+          : undefined
+      }
+    >
       <rect
         x={x}
         y={y}
@@ -205,7 +232,7 @@ function Cabinet({
   );
 }
 
-function SelectionOverlay({ x, y }: { x: number; y: number }) {
+function SelectionOverlay({ x, y, id }: { x: number; y: number; id: string }) {
   const pad = 6;
   const bx = x - pad;
   const by = y - pad;
@@ -217,6 +244,7 @@ function SelectionOverlay({ x, y }: { x: number; y: number }) {
     [bx, by + bh],
     [bx + bw, by + bh],
   ];
+  const tagWidth = 44 + id.length * 6.5;
   return (
     <g>
       <rect
@@ -243,9 +271,9 @@ function SelectionOverlay({ x, y }: { x: number; y: number }) {
       ))}
       {/* floating label tag */}
       <g transform={`translate(${x - 4}, ${by - 22})`}>
-        <rect width={92} height={18} rx={3} fill="var(--rxl-accent)" />
+        <rect width={tagWidth} height={18} rx={3} fill="var(--rxl-accent)" />
         <text
-          x={46}
+          x={tagWidth / 2}
           y={12.5}
           fontSize={10}
           fontWeight={600}
@@ -253,14 +281,14 @@ function SelectionOverlay({ x, y }: { x: number; y: number }) {
           fill="#14100c"
           textAnchor="middle"
         >
-          R04 · SELECTED
+          {id} · SELECTED
         </text>
       </g>
     </g>
   );
 }
 
-function SnapMarkers() {
+function SnapMarkers({ selectedCabinet }: { selectedCabinet: { x: number; y: number } }) {
   const points = [
     [ROW_START_X - 18, 180],
     [ROW_START_X - 18, 250],
@@ -323,15 +351,53 @@ function CoolingManifold({ label, x }: { label: string; x: number }) {
   );
 }
 
-export function EngineeringCanvas() {
+export function EngineeringCanvas({
+  selectedCabinetId,
+  onSelectCabinet,
+}: {
+  selectedCabinetId: string;
+  onSelectCabinet: (id: string) => void;
+}) {
+  const [zoom, setZoom] = useState(100);
+  const [activeTool, setActiveTool] = useState<CanvasTool>("select");
+  const [gridVisible, setGridVisible] = useState(true);
+  const [snapEnabled, setSnapEnabled] = useState(true);
+
+  const selectedCabinet =
+    ALL_CABINETS.find((c) => c.id === selectedCabinetId) ?? topRow[3];
+
+  // Alignment guide: draw between the selected cabinet and its counterpart
+  // directly across the aisle (same column, opposite row), if one exists.
+  const selectedIsTop = topRow.some((c) => c.id === selectedCabinet.id);
+  const counterpartRow = selectedIsTop ? bottomRow : topRow;
+  const counterpart = counterpartRow.find((c) => c.x === selectedCabinet.x);
+
+  const handleZoomIn = () => setZoom((z) => Math.min(ZOOM_MAX, z + 25));
+  const handleZoomOut = () => setZoom((z) => Math.max(ZOOM_MIN, z - 25));
+  const handleFit = () => setZoom(100);
+
   return (
     <section className="relative flex min-w-0 flex-1 flex-col bg-rxl-bg" aria-label="Engineering canvas">
-      <CanvasToolbar />
+      <CanvasToolbar
+        activeTool={activeTool}
+        onToolChange={setActiveTool}
+        gridVisible={gridVisible}
+        onToggleGrid={() => setGridVisible((v) => !v)}
+        snapEnabled={snapEnabled}
+        onToggleSnap={() => setSnapEnabled((v) => !v)}
+      />
 
-      <div className="relative flex-1 overflow-hidden">
+      <div
+        className={cn(
+          "relative flex-1 overflow-hidden",
+          activeTool === "pan" && "cursor-grab active:cursor-grabbing",
+          activeTool === "measure" && "cursor-crosshair"
+        )}
+      >
         <svg
           viewBox={`0 0 ${VB_W} ${VB_H}`}
-          className="h-full w-full"
+          className="h-full w-full transition-transform duration-150 ease-out"
+          style={{ transform: `scale(${zoom / 100})`, transformOrigin: "50% 50%" }}
           role="img"
           aria-label="Data Hall A floor plan — Cold Aisle 01 containment layout with cabinets R01 through R12 and cooling manifold CM-02"
         >
@@ -352,7 +418,13 @@ export function EngineeringCanvas() {
           </defs>
 
           {/* background coordinate grid */}
-          <rect x="0" y="0" width={VB_W} height={VB_H} fill="url(#grid-major)" />
+          <rect
+            x="0"
+            y="0"
+            width={VB_W}
+            height={VB_H}
+            fill={gridVisible ? "url(#grid-major)" : "var(--rxl-bg)"}
+          />
 
           {/* orientation marker */}
           <g transform={`translate(${VB_W - 60}, 60)`} aria-hidden>
@@ -381,29 +453,47 @@ export function EngineeringCanvas() {
           <CoolingManifold label="CM-02" x={485} />
           <CoolingManifold label="CM-03" x={980} />
 
-          {/* Pod A — Cold Aisle 01 (active) */}
+          {/* Pod A — Cold Aisle 01 (active, selectable) */}
           <ContainmentPod />
           {topRow.map((c) => (
-            <Cabinet key={c.id} id={c.id} x={c.x} y={c.y} selected={c.id === SELECTED_ID} />
+            <Cabinet
+              key={c.id}
+              id={c.id}
+              x={c.x}
+              y={c.y}
+              selected={c.id === selectedCabinetId}
+              interactive
+              onSelect={onSelectCabinet}
+            />
           ))}
           {bottomRow.map((c) => (
-            <Cabinet key={c.id} id={c.id} x={c.x} y={c.y} />
+            <Cabinet
+              key={c.id}
+              id={c.id}
+              x={c.x}
+              y={c.y}
+              selected={c.id === selectedCabinetId}
+              interactive
+              onSelect={onSelectCabinet}
+            />
           ))}
 
-          {/* alignment guide between R04 and R10 */}
-          <line
-            x1={selectedCabinet.x + CABINET_W / 2}
-            y1={selectedCabinet.y + CABINET_H}
-            x2={alignedCabinet.x + CABINET_W / 2}
-            y2={alignedCabinet.y}
-            stroke="var(--rxl-accent)"
-            strokeWidth={1}
-            strokeDasharray="3 3"
-            opacity={0.55}
-          />
+          {/* alignment guide between selected cabinet and its aisle counterpart */}
+          {counterpart && (
+            <line
+              x1={selectedCabinet.x + CABINET_W / 2}
+              y1={selectedIsTop ? selectedCabinet.y + CABINET_H : counterpart.y + CABINET_H}
+              x2={counterpart.x + CABINET_W / 2}
+              y2={selectedIsTop ? counterpart.y : selectedCabinet.y}
+              stroke="var(--rxl-accent)"
+              strokeWidth={1}
+              strokeDasharray="3 3"
+              opacity={0.55}
+            />
+          )}
 
-          <SnapMarkers />
-          <SelectionOverlay x={selectedCabinet.x} y={selectedCabinet.y} />
+          {snapEnabled && <SnapMarkers selectedCabinet={selectedCabinet} />}
+          <SelectionOverlay x={selectedCabinet.x} y={selectedCabinet.y} id={selectedCabinet.id} />
 
           {/* Pod B — Cold Aisle 02 (context, muted) */}
           <g opacity={0.55}>
@@ -451,9 +541,15 @@ export function EngineeringCanvas() {
           </g>
         </svg>
 
-        <CanvasZoomControls />
+        <CanvasZoomControls
+          zoom={zoom}
+          onZoomIn={handleZoomIn}
+          onZoomOut={handleZoomOut}
+          onFit={handleFit}
+        />
         <CanvasMinimap />
       </div>
     </section>
   );
 }
+
