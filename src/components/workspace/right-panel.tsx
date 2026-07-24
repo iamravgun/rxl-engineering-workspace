@@ -7,48 +7,12 @@ import {
   Loader2,
   PackageCheck,
   Save,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-
-type ValidationItem = {
-  label: string;
-  status: "passed" | "review";
-  detail: string;
-};
-
-const VALIDATION_ITEMS: ValidationItem[] = [
-  {
-    label: "Containment Layout",
-    status: "passed",
-    detail: "Cold Aisle 01 geometry within tolerance",
-  },
-  {
-    label: "Cooling Compatibility",
-    status: "passed",
-    detail: "CM-02 / CM-03 capacity matches rack load",
-  },
-  {
-    label: "Cabinet Placement",
-    status: "passed",
-    detail: "R01–R12 spacing meets clearance spec",
-  },
-  {
-    label: "Service Clearance",
-    status: "passed",
-    detail: "Front and rear access ≥ 1,200 mm",
-  },
-  {
-    label: "Documentation Ready",
-    status: "passed",
-    detail: "Drawing set complete for export",
-  },
-  {
-    label: "Power Distribution Review",
-    status: "review",
-    detail: "PDU circuit mapping needs engineer confirmation",
-  },
-];
+import { cn } from "@/lib/utils";
+import { VALIDATION_ITEMS, type ValidationItem } from "@/lib/workspace-data";
 
 function ValidationRow({ item }: { item: ValidationItem }) {
   const passed = item.status === "passed";
@@ -103,8 +67,12 @@ type ActionState = "idle" | "working" | "done";
 
 export function RightPanel({
   selectedCabinetId,
+  open,
+  onClose,
 }: {
   selectedCabinetId: string;
+  open: boolean;
+  onClose: () => void;
 }) {
   const passedCount = VALIDATION_ITEMS.filter(
     (i) => i.status === "passed"
@@ -123,7 +91,30 @@ export function RightPanel({
   }
 
   return (
-    <aside className="flex w-[360px] shrink-0 flex-col border-l border-rxl-border bg-rxl-panel">
+    <aside
+      className={cn(
+        // Mobile/tablet: fixed slide-in drawer from the right.
+        "fixed inset-y-0 right-0 z-50 flex w-[86vw] max-w-[380px] flex-col border-l border-rxl-border bg-rxl-panel shadow-2xl shadow-black/40 transition-transform duration-200 ease-out",
+        open ? "translate-x-0" : "translate-x-full",
+        // Desktop (lg+): back to the original static docked column.
+        "lg:relative lg:inset-auto lg:z-auto lg:w-[360px] lg:shrink-0 lg:translate-x-0 lg:shadow-none lg:transition-none"
+      )}
+    >
+      {/* Drawer header — only shown below lg, where this is an overlay */}
+      <div className="flex items-center justify-between border-b border-rxl-border px-5 py-4 lg:hidden">
+        <span className="text-[13px] font-semibold text-rxl-text">
+          Engineering Details
+        </span>
+        <button
+          type="button"
+          aria-label="Close panel"
+          onClick={onClose}
+          className="flex size-8 items-center justify-center rounded-md text-rxl-text-secondary transition-colors hover:bg-rxl-surface hover:text-rxl-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-rxl-accent"
+        >
+          <X className="size-4" strokeWidth={1.75} />
+        </button>
+      </div>
+
       <div className="flex-1 overflow-y-auto">
         {/* Validation summary */}
         <div className="px-5 pt-5">
