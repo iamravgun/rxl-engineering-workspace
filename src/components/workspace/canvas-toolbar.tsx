@@ -10,6 +10,7 @@ import {
   Redo2,
   Ruler,
   Undo2,
+  X,
 } from "lucide-react";
 import {
   Tooltip,
@@ -17,6 +18,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { CANVAS_LAYER_LABELS, type CanvasLayer } from "@/lib/workspace-data";
 
 export type CanvasTool = "select" | "pan" | "measure";
 
@@ -72,6 +74,8 @@ export function CanvasToolbar({
   onToggleSnap,
   pendingReviewCount,
   onOpenRightPanel,
+  activeLayer,
+  onClearLayer,
 }: {
   activeTool: CanvasTool;
   onToolChange: (tool: CanvasTool) => void;
@@ -81,6 +85,8 @@ export function CanvasToolbar({
   onToggleSnap: () => void;
   pendingReviewCount: number;
   onOpenRightPanel: () => void;
+  activeLayer: CanvasLayer | null;
+  onClearLayer: () => void;
 }) {
   return (
     <div className="flex h-11 shrink-0 items-center gap-3 overflow-x-auto border-b border-rxl-border bg-rxl-panel px-4">
@@ -104,6 +110,17 @@ export function CanvasToolbar({
       <span className="hidden shrink-0 rounded-sm border border-rxl-border-strong bg-rxl-surface px-1.5 py-0.5 text-[10.5px] font-medium uppercase tracking-wide text-rxl-text-secondary md:inline-flex">
         Engineering Review
       </span>
+
+      {activeLayer && (
+        <button
+          type="button"
+          onClick={onClearLayer}
+          className="flex shrink-0 items-center gap-1 rounded-sm border border-rxl-accent-border bg-rxl-accent-muted px-1.5 py-0.5 text-[11px] font-medium text-rxl-accent transition-colors hover:bg-rxl-accent-border/40"
+        >
+          {CANVAS_LAYER_LABELS[activeLayer]}
+          <X className="size-3" strokeWidth={2} />
+        </button>
+      )}
 
       <div className="h-5 w-px shrink-0 bg-rxl-border" />
 

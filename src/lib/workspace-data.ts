@@ -1,5 +1,16 @@
 export type ValidationStatus = "passed" | "review";
 
+// The three canvas facets that can be individually emphasized via the
+// left sidebar's Model section (Containment Systems / Cooling Manifolds /
+// Cabinets & Racks). null = show everything at normal opacity.
+export type CanvasLayer = "containment" | "cooling" | "cabinets";
+
+export const CANVAS_LAYER_LABELS: Record<CanvasLayer, string> = {
+  containment: "Containment Systems",
+  cooling: "Cooling Manifolds",
+  cabinets: "Cabinets / Racks",
+};
+
 export type ValidationItem = {
   label: string;
   status: ValidationStatus;

@@ -6,11 +6,12 @@ import { LeftSidebar } from "@/components/workspace/left-sidebar";
 import { EngineeringCanvas } from "@/components/workspace/engineering-canvas";
 import { RightPanel } from "@/components/workspace/right-panel";
 import { StatusBar } from "@/components/workspace/status-bar";
-import { VALIDATION_ITEMS } from "@/lib/workspace-data";
+import { VALIDATION_ITEMS, type CanvasLayer } from "@/lib/workspace-data";
 
 export default function EngineeringWorkspacePage() {
   const [selectedCabinetId, setSelectedCabinetId] = useState("R04");
   const [rightPanelOpen, setRightPanelOpen] = useState(false);
+  const [activeLayer, setActiveLayer] = useState<CanvasLayer | null>(null);
 
   const pendingReviewCount = VALIDATION_ITEMS.filter(
     (i) => i.status === "review"
@@ -23,12 +24,14 @@ export default function EngineeringWorkspacePage() {
     <div className="flex h-dvh w-full flex-col overflow-hidden bg-rxl-bg text-rxl-text">
       <TopNav />
       <div className="relative flex min-h-0 flex-1">
-        <LeftSidebar />
+        <LeftSidebar activeLayer={activeLayer} onSelectLayer={setActiveLayer} />
         <EngineeringCanvas
           selectedCabinetId={selectedCabinetId}
           onSelectCabinet={setSelectedCabinetId}
           pendingReviewCount={pendingReviewCount}
           onOpenRightPanel={() => setRightPanelOpen(true)}
+          activeLayer={activeLayer}
+          onSelectLayer={setActiveLayer}
         />
 
         {/* Backdrop for the right panel when it's a mobile/tablet drawer */}

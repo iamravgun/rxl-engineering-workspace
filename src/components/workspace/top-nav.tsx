@@ -13,11 +13,11 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const PRIMARY_NAV = [
-  { label: "Projects", href: "#" },
+  { label: "Projects", href: "#", disabled: true },
   { label: "Engineering Workspace", href: "#", active: true },
-  { label: "Resources", href: "#" },
-  { label: "Client Portal", href: "#" },
-  { label: "Support", href: "#" },
+  { label: "Resources", href: "#", disabled: true },
+  { label: "Client Portal", href: "#", disabled: true },
+  { label: "Support", href: "#", disabled: true },
 ];
 
 export function TopNav() {
@@ -51,21 +51,32 @@ export function TopNav() {
 
       {/* Primary nav — desktop only */}
       <nav className="hidden items-center gap-1 lg:flex">
-        {PRIMARY_NAV.map((item) => (
-          <a
-            key={item.label}
-            href={item.href}
-            aria-current={item.active ? "page" : undefined}
-            className={cn(
-              "rounded-md px-3 py-2 text-[13px] font-medium transition-colors",
-              item.active
-                ? "bg-rxl-accent-muted text-rxl-accent"
-                : "text-rxl-text-secondary hover:bg-rxl-surface hover:text-rxl-text"
-            )}
-          >
-            {item.label}
-          </a>
-        ))}
+        {PRIMARY_NAV.map((item) =>
+          item.disabled ? (
+            <span
+              key={item.label}
+              title={`${item.label} — not available in this preview`}
+              aria-disabled="true"
+              className="cursor-not-allowed rounded-md px-3 py-2 text-[13px] font-medium text-rxl-text-tertiary opacity-50"
+            >
+              {item.label}
+            </span>
+          ) : (
+            <a
+              key={item.label}
+              href={item.href}
+              aria-current={item.active ? "page" : undefined}
+              className={cn(
+                "rounded-md px-3 py-2 text-[13px] font-medium transition-colors",
+                item.active
+                  ? "bg-rxl-accent-muted text-rxl-accent"
+                  : "text-rxl-text-secondary hover:bg-rxl-surface hover:text-rxl-text"
+              )}
+            >
+              {item.label}
+            </a>
+          )
+        )}
       </nav>
 
       <div className="flex-1" />
@@ -151,22 +162,33 @@ export function TopNav() {
             />
           </div>
           <nav className="flex flex-col gap-0.5">
-            {PRIMARY_NAV.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                aria-current={item.active ? "page" : undefined}
-                onClick={() => setMenuOpen(false)}
-                className={cn(
-                  "rounded-md px-3 py-2.5 text-[13px] font-medium transition-colors",
-                  item.active
-                    ? "bg-rxl-accent-muted text-rxl-accent"
-                    : "text-rxl-text-secondary hover:bg-rxl-surface hover:text-rxl-text"
-                )}
-              >
-                {item.label}
-              </a>
-            ))}
+            {PRIMARY_NAV.map((item) =>
+              item.disabled ? (
+                <span
+                  key={item.label}
+                  aria-disabled="true"
+                  className="flex cursor-not-allowed items-center justify-between rounded-md px-3 py-2.5 text-[13px] font-medium text-rxl-text-tertiary opacity-50"
+                >
+                  {item.label}
+                  <span className="text-[10px] uppercase tracking-wide">Soon</span>
+                </span>
+              ) : (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  aria-current={item.active ? "page" : undefined}
+                  onClick={() => setMenuOpen(false)}
+                  className={cn(
+                    "rounded-md px-3 py-2.5 text-[13px] font-medium transition-colors",
+                    item.active
+                      ? "bg-rxl-accent-muted text-rxl-accent"
+                      : "text-rxl-text-secondary hover:bg-rxl-surface hover:text-rxl-text"
+                  )}
+                >
+                  {item.label}
+                </a>
+              )
+            )}
           </nav>
         </div>
       )}

@@ -12,6 +12,7 @@ import {
   ZOOM_MAX,
   ZOOM_MIN,
 } from "@/components/workspace/canvas-zoom-controls";
+import type { CanvasLayer } from "@/lib/workspace-data";
 
 // Coordinate system: 1 SVG unit = 15mm. Minor grid (40u = 600mm) matches
 // standard raised-floor tile pitch; major grid (200u = 3,000mm) is bolded.
@@ -390,11 +391,15 @@ export function EngineeringCanvas({
   onSelectCabinet,
   pendingReviewCount,
   onOpenRightPanel,
+  activeLayer,
+  onSelectLayer,
 }: {
   selectedCabinetId: string;
   onSelectCabinet: (id: string) => void;
   pendingReviewCount: number;
   onOpenRightPanel: () => void;
+  activeLayer: CanvasLayer | null;
+  onSelectLayer: (layer: CanvasLayer | null) => void;
 }) {
   const [zoom, setZoom] = useState(100);
   const [activeTool, setActiveTool] = useState<CanvasTool>("select");
@@ -414,6 +419,11 @@ export function EngineeringCanvas({
   const handleZoomOut = () => setZoom((z) => Math.max(ZOOM_MIN, z - 25));
   const handleFit = () => setZoom(100);
 
+  // When a Model-section layer is active, emphasize it and dim the rest.
+  // No filter selected -> everything renders at its normal opacity.
+  const layerOpacity = (layer: CanvasLayer) =>
+    activeLayer && activeLayer !== layer ? 0.22 : 1;
+
   return (
     <section className="relative flex min-w-0 flex-1 flex-col bg-rxl-bg" aria-label="Engineering canvas">
       <CanvasToolbar
@@ -425,6 +435,8 @@ export function EngineeringCanvas({
         onToggleSnap={() => setSnapEnabled((v) => !v)}
         pendingReviewCount={pendingReviewCount}
         onOpenRightPanel={onOpenRightPanel}
+        activeLayer={activeLayer}
+        onClearLayer={() => onSelectLayer(null)}
       />
 
       <div
@@ -493,33 +505,39 @@ export function EngineeringCanvas({
           />
 
           {/* cooling manifold routing (CM-02) */}
-          <CoolingManifold label="CM-02" x={485} />
-          <CoolingManifold label="CM-03" x={980} />
+          <g style={{ transition: "opacity 150ms ease-out" }} opacity={layerOpacity("cooling")}>
+            <CoolingManifold label="CM-02" x={485} />
+            <CoolingManifold label="CM-03" x={980} />
+          </g>
 
           {/* Pod A — Cold Aisle 01 (active, selectable) */}
-          <ContainmentPod />
-          {topRow.map((c) => (
-            <Cabinet
-              key={c.id}
-              id={c.id}
-              x={c.x}
-              y={c.y}
-              selected={c.id === selectedCabinetId}
-              interactive
-              onSelect={onSelectCabinet}
-            />
-          ))}
-          {bottomRow.map((c) => (
-            <Cabinet
-              key={c.id}
-              id={c.id}
-              x={c.x}
-              y={c.y}
-              selected={c.id === selectedCabinetId}
-              interactive
-              onSelect={onSelectCabinet}
-            />
-          ))}
+          <g style={{ transition: "opacity 150ms ease-out" }} opacity={layerOpacity("containment")}>
+            <ContainmentPod />
+          </g>
+          <g style={{ transition: "opacity 150ms ease-out" }} opacity={layerOpacity("cabinets")}>
+            {topRow.map((c) => (
+              <Cabinet
+                key={c.id}
+                id={c.id}
+                x={c.x}
+                y={c.y}
+                selected={c.id === selectedCabinetId}
+                interactive
+                onSelect={onSelectCabinet}
+              />
+            ))}
+            {bottomRow.map((c) => (
+              <Cabinet
+                key={c.id}
+                id={c.id}
+                x={c.x}
+                y={c.y}
+                selected={c.id === selectedCabinetId}
+                interactive
+                onSelect={onSelectCabinet}
+              />
+            ))}
+          </g>
 
           {/* alignment guide between selected cabinet and its aisle counterpart */}
           {counterpart && (
