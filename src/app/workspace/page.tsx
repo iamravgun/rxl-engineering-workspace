@@ -13,6 +13,8 @@ import type { CanvasLayer } from "@/lib/workspace-data";
 export default function EngineeringWorkspacePage() {
   const [selectedCabinetId, setSelectedCabinetId] = useState("R04");
   const [activeLayer, setActiveLayer] = useState<CanvasLayer | null>(null);
+  const [zoom, setZoom] = useState(100);
+  const [snapEnabled, setSnapEnabled] = useState(true);
 
   return (
     <>
@@ -50,10 +52,14 @@ export default function EngineeringWorkspacePage() {
             onSelectCabinet={setSelectedCabinetId}
             activeLayer={activeLayer}
             onSelectLayer={setActiveLayer}
+            zoom={zoom}
+            onZoomChange={setZoom}
+            snapEnabled={snapEnabled}
+            onToggleSnap={() => setSnapEnabled((v) => !v)}
           />
           <RightPanel selectedCabinetId={selectedCabinetId} />
         </div>
-        <StatusBar />
+        <StatusBar zoom={zoom} snapEnabled={snapEnabled} />
       </div>
     </>
   );

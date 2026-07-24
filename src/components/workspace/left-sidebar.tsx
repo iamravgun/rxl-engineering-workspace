@@ -79,14 +79,14 @@ function SidebarButton({
               item.disabled
                 ? "cursor-not-allowed text-rxl-text-tertiary opacity-40"
                 : active
-                ? "bg-rxl-accent-muted text-rxl-accent"
+                ? "bg-rxl-surface text-rxl-accent"
                 : "text-rxl-text-secondary hover:bg-rxl-surface hover:text-rxl-text"
             )}
           >
             {active && !item.disabled && (
-              <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-rxl-accent" />
+              <span className="absolute left-0 top-1/2 h-4 w-[2px] -translate-y-1/2 rounded-r-full bg-rxl-accent" />
             )}
-            <Icon className="size-[17px]" strokeWidth={1.6} />
+            <Icon className="size-4" strokeWidth={1.6} />
           </button>
         }
       />

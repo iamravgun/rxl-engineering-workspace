@@ -2,7 +2,7 @@
 
 export function CanvasMinimap() {
   return (
-    <div className="pointer-events-auto absolute bottom-5 right-5 w-[190px] overflow-hidden rounded-md border border-rxl-border bg-rxl-panel shadow-md shadow-black/15">
+    <div className="pointer-events-auto absolute bottom-5 right-5 w-[190px] overflow-hidden rounded-md border border-rxl-border bg-rxl-panel/90">
       <div className="border-b border-rxl-border px-2.5 py-1.5">
         <span className="text-[10px] font-semibold uppercase tracking-wide text-rxl-text-tertiary">
           Overview

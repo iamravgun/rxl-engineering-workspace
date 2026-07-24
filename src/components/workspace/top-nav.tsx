@@ -15,25 +15,25 @@ const PRIMARY_NAV = [
 
 export function TopNav() {
   return (
-    <header className="flex h-[72px] shrink-0 items-center border-b border-rxl-border bg-rxl-panel px-6">
+    <header className="flex h-[80px] shrink-0 items-center border-b border-rxl-border bg-rxl-panel px-7">
       {/* Logo */}
       <Link href="/" className="flex items-center gap-3">
-        <div className="flex size-9 items-center justify-center rounded-md bg-rxl-accent">
-          <span className="text-sm font-bold tracking-tight text-[#14100c]">
+        <div className="flex size-10 items-center justify-center rounded-md bg-rxl-accent">
+          <span className="text-[15px] font-bold tracking-tight text-[#14100c]">
             RXL
           </span>
         </div>
         <div className="hidden flex-col leading-none xl:flex">
-          <span className="text-[13px] font-semibold tracking-wide text-rxl-text">
+          <span className="text-[13.5px] font-semibold tracking-wide text-rxl-text">
             RXL
           </span>
-          <span className="text-[11px] text-rxl-text-tertiary">
+          <span className="mt-0.5 text-[11px] text-rxl-text-tertiary">
             Engineering Platform
           </span>
         </div>
       </Link>
 
-      <div className="mx-6 h-8 w-px bg-rxl-border" />
+      <div className="mx-7 h-8 w-px bg-rxl-border" />
 
       {/* Primary nav */}
       <nav className="flex items-center gap-1">
@@ -80,14 +80,16 @@ export function TopNav() {
         </kbd>
       </div>
 
-      {/* Notifications */}
+      {/* Notifications — amber, not accent: this is an attention cue,
+          not a selection/primary-action cue, so it shares the warning
+          semantic with the validation panel instead of brand orange */}
       <button
         type="button"
         aria-label="Notifications, 2 unread"
         className="relative mr-2 flex size-9 items-center justify-center rounded-md text-rxl-text-secondary transition-colors hover:bg-rxl-surface hover:text-rxl-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-rxl-accent"
       >
         <Bell className="size-[18px]" strokeWidth={1.75} />
-        <span className="absolute right-2 top-2 flex size-1.5 rounded-full bg-rxl-accent" />
+        <span className="absolute right-2 top-2 flex size-1.5 rounded-full bg-rxl-warning" />
       </button>
 
       {/* Profile */}
@@ -102,7 +104,7 @@ export function TopNav() {
           <span className="text-[12px] font-medium text-rxl-text">
             D. Mercer
           </span>
-          <span className="text-[10px] text-rxl-text-tertiary">
+          <span className="mt-0.5 text-[10px] text-rxl-text-tertiary">
             Data Center Engineer
           </span>
         </div>

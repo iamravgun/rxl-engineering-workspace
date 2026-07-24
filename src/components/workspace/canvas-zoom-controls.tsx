@@ -18,7 +18,7 @@ export function CanvasZoomControls({
   onFit: () => void;
 }) {
   return (
-    <div className="pointer-events-auto absolute bottom-5 left-5 flex items-center gap-0.5 rounded-md border border-rxl-border bg-rxl-panel p-0.5 shadow-md shadow-black/15">
+    <div className="pointer-events-auto absolute bottom-5 left-5 flex items-center gap-0.5 rounded-md border border-rxl-border bg-rxl-panel/90 p-0.5">
       <button
         type="button"
         aria-label="Zoom out"
@@ -35,7 +35,7 @@ export function CanvasZoomControls({
         type="button"
         aria-label="Reset zoom to 100%"
         onClick={onFit}
-        className="flex h-8 min-w-[52px] items-center justify-center px-1 font-mono text-[12px] tabular-nums text-rxl-text hover:text-rxl-accent"
+        className="flex h-8 min-w-[52px] items-center justify-center px-1 font-mono text-[12px] tabular-nums text-rxl-text hover:text-rxl-text-secondary"
       >
         {zoom}%
       </button>

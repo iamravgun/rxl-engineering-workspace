@@ -45,15 +45,15 @@ function ToolButton({
             disabled={disabled}
             onClick={onClick}
             className={cn(
-              "flex size-8 shrink-0 items-center justify-center rounded-md transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-rxl-accent",
+              "flex size-7 shrink-0 items-center justify-center rounded-[5px] border transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-rxl-accent",
               disabled
-                ? "cursor-not-allowed text-rxl-text-tertiary opacity-40"
+                ? "cursor-not-allowed border-transparent text-rxl-text-tertiary opacity-40"
                 : active
-                ? "bg-rxl-accent-muted text-rxl-accent"
-                : "text-rxl-text-secondary hover:bg-rxl-surface hover:text-rxl-text"
+                ? "border-rxl-border-strong bg-rxl-surface-raised text-rxl-text"
+                : "border-transparent text-rxl-text-secondary hover:bg-rxl-surface hover:text-rxl-text"
             )}
           >
-            <Icon className="size-4" strokeWidth={1.75} />
+            <Icon className="size-[15px]" strokeWidth={1.75} />
           </button>
         }
       />
@@ -61,6 +61,16 @@ function ToolButton({
         {disabled ? `${label} (nothing to ${label.toLowerCase()})` : label}
       </TooltipContent>
     </Tooltip>
+  );
+}
+
+// A bordered cluster of related tool buttons — reads as one control
+// group instead of loose icons separated by hairline dividers.
+function ToolGroup({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex shrink-0 items-center gap-0.5 rounded-md border border-rxl-border bg-rxl-surface p-0.5">
+      {children}
+    </div>
   );
 }
 
@@ -95,26 +105,23 @@ export function CanvasToolbar({
         </span>
       </div>
 
-      <div className="h-3.5 w-px shrink-0 bg-rxl-border" />
-
-      <span className="shrink-0 rounded-sm border border-rxl-border-strong bg-rxl-surface px-1.5 py-0.5 text-[10.5px] font-medium uppercase tracking-wide text-rxl-text-secondary">
-        Engineering Review
-      </span>
-
       {activeLayer && (
-        <button
-          type="button"
-          onClick={onClearLayer}
-          className="flex shrink-0 items-center gap-1 rounded-sm border border-rxl-accent-border bg-rxl-accent-muted px-1.5 py-0.5 text-[11px] font-medium text-rxl-accent transition-colors hover:bg-rxl-accent-border/40"
-        >
-          {CANVAS_LAYER_LABELS[activeLayer]}
-          <X className="size-3" strokeWidth={2} />
-        </button>
+        <>
+          <div className="h-3.5 w-px shrink-0 bg-rxl-border" />
+          <button
+            type="button"
+            onClick={onClearLayer}
+            className="flex shrink-0 items-center gap-1 rounded-sm border border-rxl-accent-border bg-rxl-accent-muted px-1.5 py-0.5 text-[11px] font-medium text-rxl-accent transition-colors hover:bg-rxl-accent-border/40"
+          >
+            {CANVAS_LAYER_LABELS[activeLayer]}
+            <X className="size-3" strokeWidth={2} />
+          </button>
+        </>
       )}
 
       <div className="h-5 w-px shrink-0 bg-rxl-border" />
 
-      <div className="flex shrink-0 items-center gap-0.5">
+      <ToolGroup>
         <ToolButton
           icon={MousePointer2}
           label="Select"
@@ -133,18 +140,16 @@ export function CanvasToolbar({
           active={activeTool === "measure"}
           onClick={() => onToolChange("measure")}
         />
-      </div>
+      </ToolGroup>
 
-      <div className="h-5 w-px shrink-0 bg-rxl-border" />
-
-      <div className="flex shrink-0 items-center gap-0.5">
+      <ToolGroup>
         <ToolButton icon={Undo2} label="Undo" disabled />
         <ToolButton icon={Redo2} label="Redo" disabled />
-      </div>
+      </ToolGroup>
 
       <div className="flex-1" />
 
-      <div className="flex shrink-0 items-center gap-0.5">
+      <ToolGroup>
         <ToolButton
           icon={Grid3x3}
           label="Toggle Grid"
@@ -157,7 +162,7 @@ export function CanvasToolbar({
           active={snapEnabled}
           onClick={onToggleSnap}
         />
-      </div>
+      </ToolGroup>
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CanvasMinimap } from "@/components/workspace/canvas-minimap";
+import { ProjectContextStrip } from "@/components/workspace/project-context-strip";
 import { cn } from "@/lib/utils";
 import {
   CanvasToolbar,
@@ -172,8 +173,21 @@ function DimensionLine({
 }) {
   const midX = (x1 + x2) / 2;
   const midY = (y1 + y2) / 2;
+  const tick = 4;
   return (
-    <g stroke="var(--rxl-text-tertiary)" strokeWidth={1}>
+    <g stroke="var(--rxl-text-secondary)" strokeWidth={1}>
+      {/* perpendicular end ticks — standard drafting extension-line caps */}
+      {vertical ? (
+        <>
+          <line x1={x1 - tick} y1={y1} x2={x1 + tick} y2={y1} />
+          <line x1={x2 - tick} y1={y2} x2={x2 + tick} y2={y2} />
+        </>
+      ) : (
+        <>
+          <line x1={x1} y1={y1 - tick} x2={x1} y2={y1 + tick} />
+          <line x1={x2} y1={y2 - tick} x2={x2} y2={y2 + tick} />
+        </>
+      )}
       <line x1={x1} y1={y1} x2={x2} y2={y2} markerStart="url(#dim-arrow-start)" markerEnd="url(#dim-arrow-end)" />
       <rect
         x={vertical ? midX - 9 : midX - label.length * 3.4}
@@ -386,21 +400,45 @@ function CoolingManifold({ label, x }: { label: string; x: number }) {
   );
 }
 
+// Cold-supply airflow drawn into both cabinet rows from the contained
+// aisle — standard containment-diagram convention, not decorative.
+function AirflowArrows() {
+  const xs = [320, 430, 540];
+  return (
+    <g opacity={0.55}>
+      {xs.map((x) => (
+        <g key={x}>
+          <line x1={x} y1={289} x2={x} y2={277} stroke="#5b8aa6" strokeWidth={1} strokeDasharray="2 2" />
+          <path d={`M ${x - 4} 276 L ${x + 4} 276 L ${x} 267 Z`} fill="#5b8aa6" />
+          <line x1={x} y1={351} x2={x} y2={363} stroke="#5b8aa6" strokeWidth={1} strokeDasharray="2 2" />
+          <path d={`M ${x - 4} 364 L ${x + 4} 364 L ${x} 373 Z`} fill="#5b8aa6" />
+        </g>
+      ))}
+    </g>
+  );
+}
+
 export function EngineeringCanvas({
   selectedCabinetId,
   onSelectCabinet,
   activeLayer,
   onSelectLayer,
+  zoom,
+  onZoomChange,
+  snapEnabled,
+  onToggleSnap,
 }: {
   selectedCabinetId: string;
   onSelectCabinet: (id: string) => void;
   activeLayer: CanvasLayer | null;
   onSelectLayer: (layer: CanvasLayer | null) => void;
+  zoom: number;
+  onZoomChange: (zoom: number) => void;
+  snapEnabled: boolean;
+  onToggleSnap: () => void;
 }) {
-  const [zoom, setZoom] = useState(100);
   const [activeTool, setActiveTool] = useState<CanvasTool>("select");
   const [gridVisible, setGridVisible] = useState(true);
-  const [snapEnabled, setSnapEnabled] = useState(true);
 
   const selectedCabinet =
     ALL_CABINETS.find((c) => c.id === selectedCabinetId) ?? topRow[3];
@@ -411,9 +449,9 @@ export function EngineeringCanvas({
   const counterpartRow = selectedIsTop ? bottomRow : topRow;
   const counterpart = counterpartRow.find((c) => c.x === selectedCabinet.x);
 
-  const handleZoomIn = () => setZoom((z) => Math.min(ZOOM_MAX, z + 25));
-  const handleZoomOut = () => setZoom((z) => Math.max(ZOOM_MIN, z - 25));
-  const handleFit = () => setZoom(100);
+  const handleZoomIn = () => onZoomChange(Math.min(ZOOM_MAX, zoom + 25));
+  const handleZoomOut = () => onZoomChange(Math.max(ZOOM_MIN, zoom - 25));
+  const handleFit = () => onZoomChange(100);
 
   // When a Model-section layer is active, emphasize it and dim the rest.
   // No filter selected -> everything renders at its normal opacity.
@@ -422,13 +460,14 @@ export function EngineeringCanvas({
 
   return (
     <section className="relative flex min-w-0 flex-1 flex-col bg-rxl-bg" aria-label="Engineering canvas">
+      <ProjectContextStrip />
       <CanvasToolbar
         activeTool={activeTool}
         onToolChange={setActiveTool}
         gridVisible={gridVisible}
         onToggleGrid={() => setGridVisible((v) => !v)}
         snapEnabled={snapEnabled}
-        onToggleSnap={() => setSnapEnabled((v) => !v)}
+        onToggleSnap={onToggleSnap}
         activeLayer={activeLayer}
         onClearLayer={() => onSelectLayer(null)}
       />
@@ -498,10 +537,11 @@ export function EngineeringCanvas({
             strokeWidth={3}
           />
 
-          {/* cooling manifold routing (CM-02) */}
+          {/* cooling manifold routing (CM-02) + supply airflow */}
           <g style={{ transition: "opacity 150ms ease-out" }} opacity={layerOpacity("cooling")}>
             <CoolingManifold label="CM-02" x={485} />
             <CoolingManifold label="CM-03" x={980} />
+            <AirflowArrows />
           </g>
 
           {/* Pod A — Cold Aisle 01 (active, selectable) */}
@@ -586,9 +626,9 @@ export function EngineeringCanvas({
 
           {/* crosshair cursor position indicator */}
           <g transform="translate(790, 590)" aria-hidden>
-            <line x1="-9" y1="0" x2="9" y2="0" stroke="var(--rxl-accent)" strokeWidth={1} />
-            <line x1="0" y1="-9" x2="0" y2="9" stroke="var(--rxl-accent)" strokeWidth={1} />
-            <circle r="3.5" fill="none" stroke="var(--rxl-accent)" strokeWidth={1} />
+            <line x1="-9" y1="0" x2="9" y2="0" stroke="var(--rxl-text-secondary)" strokeWidth={1} />
+            <line x1="0" y1="-9" x2="0" y2="9" stroke="var(--rxl-text-secondary)" strokeWidth={1} />
+            <circle r="3.5" fill="none" stroke="var(--rxl-text-secondary)" strokeWidth={1} />
             <rect x="14" y="-9" width="112" height="18" rx={3} fill="var(--rxl-panel)" stroke="var(--rxl-border-strong)" strokeWidth={1} />
             <text x="70" y="3.5" fontSize="9.5" fontFamily="var(--font-mono)" fill="var(--rxl-text-secondary)" textAnchor="middle">
               X 8,850  Y 7,050 mm

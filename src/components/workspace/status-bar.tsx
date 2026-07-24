@@ -1,6 +1,7 @@
 "use client";
 
 import { Magnet, Save } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 function StatusItem({
   label,
@@ -19,16 +20,29 @@ function StatusItem({
   );
 }
 
-export function StatusBar() {
+export function StatusBar({
+  zoom,
+  snapEnabled,
+}: {
+  zoom: number;
+  snapEnabled: boolean;
+}) {
   return (
-    <footer className="flex h-8 shrink-0 items-center gap-5 border-t border-rxl-border bg-rxl-panel px-5 text-[11px]">
+    <footer className="flex h-8 shrink-0 items-center gap-4 border-t border-rxl-border bg-rxl-panel px-5 text-[11px]">
       <StatusItem label="Grid" value="600 mm" />
       <StatusItem label="Units" value="Millimeters" />
-      <StatusItem label="Zoom" value="100%" />
+      <StatusItem label="Zoom" value={`${zoom}%`} />
+
+      <div className="h-3.5 w-px bg-rxl-border" />
 
       <div className="flex items-center gap-1.5">
-        <Magnet className="size-3 text-rxl-accent" strokeWidth={2} />
-        <span className="text-rxl-text-secondary">Snap ON</span>
+        <Magnet
+          className={cn("size-3", snapEnabled ? "text-rxl-text-secondary" : "text-rxl-text-tertiary")}
+          strokeWidth={2}
+        />
+        <span className={snapEnabled ? "text-rxl-text-secondary" : "text-rxl-text-tertiary"}>
+          Snap {snapEnabled ? "ON" : "OFF"}
+        </span>
       </div>
 
       <div className="h-3.5 w-px bg-rxl-border" />
@@ -41,7 +55,12 @@ export function StatusBar() {
       <div className="flex-1" />
 
       <StatusItem label="Revision" value="Rev 03" />
+
+      <div className="h-3.5 w-px bg-rxl-border" />
+
       <StatusItem label="Project" value="DC-West-01" />
+
+      <div className="h-3.5 w-px bg-rxl-border" />
 
       <div className="flex items-center gap-1.5">
         <span className="flex size-1.5 rounded-full bg-rxl-success" />
